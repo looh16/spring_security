@@ -1,27 +1,26 @@
 package com.bank.api.controllers;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bank.api.model.Loans;
-import com.bank.api.repository.LoanRepository;
+import com.bank.api.model.Cards;
+import com.bank.api.repository.CardsRepository;
 
 import java.util.List;
 
 @RestController
-public class LoansController {
+public class CardsController {
 
     @Autowired
-    private LoanRepository loanRepository;
+    private CardsRepository cardsRepository;
 
-    @GetMapping("/myLoans")
-    public List<Loans> getLoanDetails(@RequestParam int id) {
-        List<Loans> loans = loanRepository.findByCustomerIdOrderByStartDtDesc(id);
-        if (loans != null ) {
-            return loans;
+    @GetMapping("/myCards")
+    public List<Cards> getCardDetails(@RequestParam int id) {
+        List<Cards> cards = cardsRepository.findByCustomerId(id);
+        if (cards != null ) {
+            return cards;
         }else {
             return null;
         }
