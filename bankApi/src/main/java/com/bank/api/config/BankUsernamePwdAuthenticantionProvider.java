@@ -26,7 +26,7 @@ public class BankUsernamePwdAuthenticantionProvider implements AuthenticationPro
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	 @Override
+	   @Override
 	    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 	        String username = authentication.getName();
 	        String pwd = authentication.getCredentials().toString();
