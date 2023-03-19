@@ -23,35 +23,38 @@ import java.util.Collections;
 @Configuration
 public class SecurityConfig {
 	
-	 @Bean
+	   @Bean
 	    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 	        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
 	        requestHandler.setCsrfRequestAttributeName("_csrf");
-
 	        http.securityContext().requireExplicitSave(false)
 	                .and().sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
 	                .cors().configurationSource(new CorsConfigurationSource() {
-	                    @Override
-	                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-	                        CorsConfiguration config = new CorsConfiguration();
-	                        config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
-	                        config.setAllowedMethods(Collections.singletonList("*"));
-	                        config.setAllowCredentials(true);
-	                        config.setAllowedHeaders(Collections.singletonList("*"));
-	                        config.setMaxAge(3600L);
-	                        return config;
-	                    }
-	                }).and().csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact", "/register")
-	                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-	                        .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+	            @Override
+	            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+	                CorsConfiguration config = new CorsConfiguration();
+	                config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+	                config.setAllowedMethods(Collections.singletonList("*"));
+	                config.setAllowCredentials(true);
+	                config.setAllowedHeaders(Collections.singletonList("*"));
+	                config.setMaxAge(3600L);
+	                return config;
+	            }
+	        }).and().csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact","/register")
+	                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+	                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
 	                .authorizeHttpRequests()
-	                        .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/user").authenticated()
-	                        .requestMatchers("/notices", "/contact", "/register").permitAll()
+	                        .requestMatchers("/myAccount").hasRole("USER")
+	                        .requestMatchers("/myBalance").hasAnyRole("USER","ADMIN")
+	                        .requestMatchers("/myLoans").hasRole("USER")
+	                        .requestMatchers("/myCards").hasRole("USER")
+	                        .requestMatchers("/user").authenticated()
+	                        .requestMatchers("/notices","/contact","/register").permitAll()
 	                .and().formLogin()
 	                .and().httpBasic();
 	        return http.build();
 	    }
-	
+	   
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
